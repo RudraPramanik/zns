@@ -1,46 +1,45 @@
 'use client';
 
-import { fetchProductById, fetchRelatedProducts } from '../../../api/products';
-import { useRouter } from 'next/router';
-import { useState, useEffect } from 'react';
-import ProductCard from '../../../components/ProductCard';
+import axios from 'axios';
+import { useSearchParams, useParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import ProductDetails from '../../../components/ProductDetails';
 
-const SingleProductPage = () => {
-  const router = useRouter();
-  const { id } = router.query;
-  const [product, setProduct] = useState(null);
-  const [relatedProducts, setRelatedProducts] = useState([]);
+interface Product {
+  id: number;
+  title: string;
+  short_desc: string;
+  images: { image: string }[];
+  selling_price: number;
+  variants: {
+    code: string;
+    size: string;
+    color: string;
+    stock: number;
+  }[];
+}
+
+const ProductPage = () => {
+  const params = useParams();
+  const searchParams = useSearchParams();
+  const id = params.id || searchParams.get('id'); // Adjust based on how you handle the dynamic segments
+  const [product, setProduct] = useState<Product | null>(null);
 
   useEffect(() => {
     if (id) {
       const fetchProduct = async () => {
-        const response = await fetchProductById(id);
-        setProduct(response);
-        const related = await fetchRelatedProducts(id);
-        setRelatedProducts(related.products);
+        const { data } = await axios.get(
+          `https://api.zonesparks.org/products/${id}/`
+        );
+        setProduct(data);
       };
       fetchProduct();
     }
   }, [id]);
 
-  if (!product) return <div>Loading...</div>;
+  if (!product) return <p>Loading...</p>;
 
-  return (
-    <div>
-      <div className="product-details">
-        <h1>{product.title}</h1>
-        {/* Add other product details and Add to Cart option here */}
-      </div>
-      <div className="related-products">
-        <h2>Related Products</h2>
-        <div className="product-grid">
-          {relatedProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
-      </div>
-    </div>
-  );
+  return <ProductDetails product={product} />;
 };
 
-export default SingleProductPage;
+export default ProductPage;

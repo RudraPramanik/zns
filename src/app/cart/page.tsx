@@ -1,49 +1,52 @@
 'use client';
+import { useSession } from 'next-auth/react';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
+import CartItem from '../../components/CartItem';
 
-import { fetchCart, updateCartItem, deleteCartItem } from '../api/cart';
-import { useState, useEffect } from 'react';
+interface Cart {
+  id: number;
+  items: {
+    id: number;
+    product: {
+      id: number;
+      title: string;
+      images: { thumb: string }[];
+      variants: { stock: number };
+    };
+    size: string;
+    color: string;
+    quantity: number;
+    sub_total: number;
+  }[];
+  grand_total: number;
+}
 
 const CartPage = () => {
-  const [cart, setCart] = useState(null);
+  const { data: session } = useSession();
+  const [cart, setCart] = useState<Cart | null>(null);
 
   useEffect(() => {
-    const fetchUserCart = async () => {
-      const response = await fetchCart(1); // Replace with actual user ID
-      setCart(response);
-    };
-    fetchUserCart();
-  }, []);
+    if (session) {
+      const fetchCart = async () => {
+        const { data } = await axios.get('https://api.zonesparks.org/cart/', {
+          headers: { Authorization: `Bearer ${session.accessToken}` },
+        });
+        setCart(data);
+      };
+      fetchCart();
+    }
+  }, [session]);
 
-  const handleQuantityChange = async (itemId, newQuantity) => {
-    await updateCartItem(1, itemId, newQuantity); // Replace with actual user ID
-    // Fetch updated cart
-  };
-
-  const handleRemoveItem = async (itemId) => {
-    await deleteCartItem(1, itemId); // Replace with actual user ID
-    // Fetch updated cart
-  };
-
-  if (!cart) return <div>Loading...</div>;
+  if (!session) return <p>Please login to view your cart.</p>;
 
   return (
     <div>
-      <h1>Your Cart</h1>
-      {cart.items.map((item) => (
-        <div key={item.id} className="cart-item">
-          <h2>{item.product.title}</h2>
-          <p>
-            Quantity:{' '}
-            <input
-              type="number"
-              value={item.quantity}
-              onChange={(e) => handleQuantityChange(item.id, e.target.value)}
-            />
-          </p>
-          <button onClick={() => handleRemoveItem(item.id)}>Remove</button>
-        </div>
-      ))}
-      <h3>Total: {cart.grand_total}</h3>
+      {cart?.items.length ? (
+        cart.items.map((item) => <CartItem key={item.id} item={item} />)
+      ) : (
+        <p>Your cart is empty.</p>
+      )}
     </div>
   );
 };
