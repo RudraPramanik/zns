@@ -4,34 +4,46 @@ import { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import ProductList from '../components/ProductList';
 import ProductFilter from '../components/ProductFilter';
+import PostList from '../components/link';
+import { useRouter } from 'next/navigation'
 
 interface Product {
-  id: number;
-  title: string;
-  images: { thumb: string }[];
-  selling_price: number;
+
 }
 
 const HomePage = () => {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [filters, setFilters] = useState({});
+  const router = useRouter()
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      const { data } = await axios.get('https://api.zonesparks.org/products/', {
-        params: filters,
-      });
-      setProducts(data.products);
-    };
-    fetchProducts();
-  }, [filters]);
-
+  const posts = [
+    {
+      id: 1,
+      slug: 'introduction-to-nextjs',
+      title: 'Introduction to Next.js'
+    },
+    {
+      id: 2,
+      slug: 'deep-dive-into-ssg-and-ssr',
+      title: 'Deep Dive into SSG and SSR'
+    },
+    {
+      id: 3,
+      slug: 'why-nextjs-is-great-for-seo',
+      title: 'Why Next.js is Great for SEO'
+    },
+    {
+      id: 4,
+      slug: 'using-prisma-with-nextjs',
+      title: 'Using Prisma with Next.js'
+    }
+  ];
+  
   return (
     <div>
-      <Navbar />
-
-      <ProductFilter onFilter={setFilters} />
-      <ProductList products={products} />
+    hello
+    <PostList posts={posts} />
+    <button type="button" onClick={() => router.push('/dashboard')}>
+      Dashboard
+    </button>
     </div>
   );
 };
