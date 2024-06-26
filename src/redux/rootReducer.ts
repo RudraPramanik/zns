@@ -1,10 +1,10 @@
+'use client'
 import { combineReducers } from '@reduxjs/toolkit';
-import productsReducer from './slices/productsSlice';
-import cartReducer from './slices/cartSlice';
+import someSlice from './slices/counterSlice';
 
 const rootReducer = combineReducers({
-  products: productsReducer,
-  cart: cartReducer,
+  someSlice: someSlice,
+  // Add more reducers here
 });
 
 export type RootState = ReturnType<typeof rootReducer>;

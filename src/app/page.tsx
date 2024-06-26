@@ -6,7 +6,7 @@ import ProductList from '../components/ProductList';
 import ProductFilter from '../components/ProductFilter';
 import PostList from '../components/link';
 import { useRouter } from 'next/navigation'
-
+import { Counter } from '../components/Counter';
 interface Product {
 
 }
@@ -44,6 +44,7 @@ const HomePage = () => {
     <button type="button" onClick={() => router.push('/dashboard')}>
       Dashboard
     </button>
+    <Counter/>
     </div>
   );
 };

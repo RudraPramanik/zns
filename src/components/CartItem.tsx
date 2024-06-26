@@ -1,3 +1,4 @@
+'use client'
 import { useAppDispatch } from '../store';
 import { removeFromCart, updateCartQuantity } from '../store/slices/cartSlice';
 
